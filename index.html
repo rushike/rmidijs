@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+</head>
+<body>
+  <button onclick="playx()">Click Me</button>
+  <script type="module">
+    import {MidiPlayer} from "./src/player/midi_player.ts"
+    var src = "data:audio/mid;base64,TVRoZAAAAAYAAQABAeBNVHJrAAAAdQD/AwZQaWFubwAA/1gEBAIYCAD/WQIAAAD/UQMHoSAAsHkAAMAAALAHZAAKQABbAABdAAD/IQEAAJBHUINHRwAZSFCDR0gAGUpQg0dKABlMUINHTAAZTFCDR0wAGUpQg0dKABlIUINHSAAZRVCDR0UAAf8vAA=="
+    window.playx = async function play() {
+      var p = new MidiPlayer(src);
+      console.log(p);
+      p.play();
+      
+    }
+  </script>
+</body>
+</html>
