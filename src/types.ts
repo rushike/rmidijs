@@ -50,7 +50,7 @@ export type AbsControllerEventType  = {
 
 export type AbsTempoEventType = {
   time  : number // in seconds
-  tempo : number // in bpm
+  tempo : number // in qbpm
 }
 
 export type AbsMidiNoteType = {

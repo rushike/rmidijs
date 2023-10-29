@@ -1,8 +1,9 @@
 import {z} from "zod"
 
 
-import { parse } from "./parser";
+import { parse } from "../parser";
 import { MidiHeaderType, MidiTrackType } from "../types";
+import { clone } from "../utils";
 
 
 const MidiJsonSchema = z.object({
@@ -43,10 +44,10 @@ export class Midiv1 {
 	}
 
 	json() {
-		return JSON.parse(JSON.stringify({
+		return clone({
 			header : this.header,
 			tracks : this.tracks
-		}))
+		})
 	}
 
 	/**

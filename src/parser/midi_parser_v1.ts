@@ -1,7 +1,7 @@
-import { Reader } from "../../reader";
-import { MidiHeaderType, MidiTrackType } from "../../types";
-import { is_equal } from "../../utils";
-import { MidiBuffer } from "../buffer";
+import { Reader } from "../reader";
+import { MidiHeaderType, MidiTrackType } from "../types";
+import { is_equal } from "../utils";
+import { MidiBuffer } from "./buffer";
 
 export function midi_parser_v1(src : string | Uint8Array) {
 	var last_event_type_byte : any;
