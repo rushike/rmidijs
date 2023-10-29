@@ -67,3 +67,18 @@ export function masked_number(data : BufType, mask : number | number[]): number 
   }
   return num;
 }
+
+export const NOTES = {
+  "sharp" : ["C", "C#", "D", "D#", "E", "F",  "F#", "G", "G#", "A", "A#", "B"] ,
+  "flat" : ["C",  "Db", "D", "Eb", "E", "F",  "Gb", "G", "Ab", "A", "Bb", "B"] 
+}
+
+export function midi_note(id : number, type : "sharp" | "flat" = "sharp") {
+  var octave = Math.floor(id / 12) - 1
+  var name = `${NOTES[type][id % 12]}{octave}`
+  return {
+    id,
+    name,
+    octave
+  }
+}

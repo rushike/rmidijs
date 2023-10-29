@@ -1,28 +1,6 @@
-import {z} from "zod"
-
-
 import { parse } from "../parser";
-import { MidiHeaderType, MidiTrackType } from "../types";
-import { clone } from "../utils";
-
-
-const MidiJsonSchema = z.object({
-	"header":  z.object({
-		"format": z.number(),
-		"ticks": z.number(),
-		"tracks": z.number(),
-	}),
-	"duration" : z.number(),
-	"tracks" : z.array(
-		z.array(
-			z.object({
-
-			})
-		)
-	)
-})
-
-export type MidiJson = z.infer<typeof MidiJsonSchema>
+import { AbsMidiHeaderType, AbsMidiTrackType, AbsTempoEventType, MidiHeaderType, MidiTrackType, AbsMidiNoteType, MidiEventType, Dictionary } from '../types';
+import { clone, midi_note } from '../utils';
 
 /*
 class to parse the .mid base64 string
@@ -94,5 +72,85 @@ export class Midiv1 {
 		this.tracks[track].filter( _=> _.type === "channel" && (
 			_.subtype === "note_off" || _.subtype === "note_on"
 		))
+	}
+}
+
+
+export class AbsMidiv1 {
+	header : AbsMidiHeaderType
+	tracks  : AbsMidiTrackType[] = []
+
+	constructor(src : Midiv1) {
+		this.header = src.header;
+
+
+
+		src.tracks.forEach((track, i) => {
+			var name = src.track_name(i);
+			var notes : AbsMidiNoteType[] = [];
+			var controller = {}
+			var tempos : AbsTempoEventType[] = [];
+
+			var timekeeper : Dictionary<MidiEventType> = {}
+
+			/**  time = 60 / (tempo * resolution ) * delta_time */
+			var time : number = 0;
+
+			
+			var tempo : AbsTempoEventType = {
+				time : 0,
+				qbpm : 120,
+				microsecs : 0.500000
+			}
+
+			// var secs_per_tick = 60 / (tempo.microsecs * this.header.resolution)
+			var ticks = 0;
+
+			track.forEach(event => {
+				
+				ticks += event.delta_time
+				time += event.delta_time * tempo.microsecs / this.header.resolution;
+				
+				switch(event.subtype) {
+					case "note_off": 
+						if (event.note_id && event.note_id in timekeeper) {
+							var note = timekeeper[event.note_id];
+							note.time && notes.push({
+								time,
+								ticks,
+								duration : time - note.time,
+								velocity : note.velocity || 90,
+								...midi_note(event.note_id),
+							})
+						}
+						break;
+					case "note_on" :
+						if (typeof event.note_id === "number") {
+							timekeeper[event.note_id] = {time : time, ...event}
+						}
+						break;
+					case "set_tempo":
+						tempo = {
+							time,
+							qbpm      : event.qbpm || 120,
+							microsecs : (event.microsecs || 500000 ) / 1e6
+						}
+						tempos.push(tempo)
+				}
+			})
+
+
+
+			this.tracks.push({
+				name : name || `Track-${i}`,
+				notes,
+				tempos
+			})
+		})
+	}
+
+	static parse(src : string | Midiv1) {
+		if (typeof src === "string") return new AbsMidiv1(Midiv1.parse(src));
+		return new AbsMidiv1(src);
 	}
 }

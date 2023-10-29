@@ -78,11 +78,8 @@ export function midi_parser_v1(src : string | Uint8Array) {
 					case 0x51:
 						event.subtype = 'set_tempo';
 						if (length != 3) throw "Expected length for set_tempo event is 3, got " + length;
-						event.microsecondsPerBeat = (
-							(buf.read_int8() << 16)
-							+ (buf.read_int8() << 8)
-							+ buf.read_int8()
-						)
+						event.microsecs = buf.read_int24()
+						event.qbpm = event.microsecs / 500000 * 120;
 						return event;
 					case 0x54:
 						event.subtype = 'smpte_offset';
@@ -155,11 +152,11 @@ export function midi_parser_v1(src : string | Uint8Array) {
 			switch (eventType) {
 				case 0x08:
 					event.subtype = 'note_off';
-					event.noteNumber = param1;
+					event.note_id = param1;
 					event.velocity = buf.read_int8();
 					return event;
 				case 0x09:
-					event.noteNumber = param1;
+					event.note_id = param1;
 					event.velocity = buf.read_int8();
 					if (event.velocity == 0) {
 						event.subtype = 'note_off';
@@ -169,7 +166,7 @@ export function midi_parser_v1(src : string | Uint8Array) {
 					return event;
 				case 0x0a:
 					event.subtype = 'note_after_touch';
-					event.noteNumber = param1;
+					event.note_id = param1;
 					event.amount = buf.read_int8();
 					return event;
 				case 0x0b:
@@ -218,16 +215,16 @@ export function midi_parser_v1(src : string | Uint8Array) {
     //@ts-ignore
 		var count = header_buffer.read_int16();
     var time_division = header_buffer.read_int16();
-    var ticks;
+    var resolution;
     if (time_division & 0x8000) {
       throw "Expressing time division in SMTPE frames is not supported yet"
     } else {
-      ticks = time_division;
+      resolution = time_division;
     }
     var header : MidiHeaderType = {
       'format': format,
       'tracks': count,
-      'ticks': ticks
+      'resolution': resolution
     };
 
 		var tracks : MidiTrackType[] = [];

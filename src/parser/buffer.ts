@@ -25,6 +25,13 @@ export class MidiBuffer {
 		return masked_number(this.data.subarray(this.position - 2, this.position), 0xFF)
 	}
 	
+	/* read a big-endian 16-bit integer */
+	read_int24() {
+		this.position += 3;
+		return masked_number(this.data.subarray(this.position - 3, this.position), 0xFF)
+	}
+	
+
 	/* read an 8-bit integer */
 	read_int8(signed : boolean = false) {
     this.position += 1;
