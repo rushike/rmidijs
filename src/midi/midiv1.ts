@@ -100,7 +100,7 @@ export class AbsMidiv1 {
 			var tempo : AbsTempoEventType = {
 				time : 0,
 				qbpm : 120,
-				microsecs : 0.500000
+				secs : 0.500000
 			}
 
 			// var secs_per_tick = 60 / (tempo.microsecs * this.header.resolution)
@@ -109,7 +109,7 @@ export class AbsMidiv1 {
 			track.forEach(event => {
 				
 				ticks += event.delta_time
-				time += event.delta_time * tempo.microsecs / this.header.resolution;
+				time += event.delta_time * tempo.secs / this.header.resolution;
 				
 				switch(event.subtype) {
 					case "note_off": 
@@ -132,8 +132,8 @@ export class AbsMidiv1 {
 					case "set_tempo":
 						tempo = {
 							time,
-							qbpm      : event.qbpm || 120,
-							microsecs : (event.microsecs || 500000 ) / 1e6
+							qbpm : event.qbpm || 120,
+							secs : (event.microsecs || 500000 ) / 1e6
 						}
 						tempos.push(tempo)
 				}

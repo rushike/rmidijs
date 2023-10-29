@@ -40,31 +40,31 @@ export function midi_parser_v1(src : string | Uint8Array) {
 						return event;
 					case 0x01:
 						event.subtype = 'text';
-						event.text = buf.read(length);
+						event.text = new TextDecoder().decode(buf.read(length));
 						return event;
 					case 0x02:
 						event.subtype = 'copyright_notice';
-						event.text = buf.read(length);
+						event.text = new TextDecoder().decode(buf.read(length));
 						return event;
 					case 0x03:
 						event.subtype = 'track_name';
-						event.text = buf.read(length);
+						event.text = new TextDecoder().decode(buf.read(length));
 						return event;
 					case 0x04:
 						event.subtype = 'instrument_name';
-						event.text = buf.read(length);
+						event.text = new TextDecoder().decode(buf.read(length));
 						return event;
 					case 0x05:
 						event.subtype = 'lyrics';
-						event.text = buf.read(length);
+						event.text = new TextDecoder().decode(buf.read(length));
 						return event;
 					case 0x06:
 						event.subtype = 'marker';
-						event.text = buf.read(length);
+						event.text = new TextDecoder().decode(buf.read(length));
 						return event;
 					case 0x07:
 						event.subtype = 'cue_point';
-						event.text = buf.read(length);
+						event.text = new TextDecoder().decode(buf.read(length));
 						return event;
 					case 0x20:
 						event.subtype = 'midi_channel_prefix';
