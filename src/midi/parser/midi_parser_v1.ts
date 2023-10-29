@@ -6,6 +6,8 @@ import { MidiBuffer } from "../buffer";
 export function midi_parser_v1(src : string | Uint8Array) {
 	var last_event_type_byte : any;
 
+	var ticks = 0;
+
 	function read_chunk(buf : MidiBuffer) {
 		var id = buf.read(4);
 		var length = buf.read_int32();
@@ -19,7 +21,9 @@ export function midi_parser_v1(src : string | Uint8Array) {
 	
 	function read_event(buf : MidiBuffer) {
 		var event : any = {};
-		event.deltaTime = buf.read_varint();
+		event.delta_time = buf.read_varint();
+		ticks += event.delta_time;
+		event.ticks = ticks;
 		var event_type_byte = buf.read_int8();
 		if ((event_type_byte & 0xf0) == 0xf0) {
 			/* system / meta event */
@@ -108,7 +112,7 @@ export function midi_parser_v1(src : string | Uint8Array) {
 						event.scale = buf.read_int8();
 						return event;
 					case 0x7f:
-						event.subtype = 'sequencerSpecific';
+						event.subtype = 'sequencer_specific';
 						event.data = buf.read(length);
 						return event;
 					default:

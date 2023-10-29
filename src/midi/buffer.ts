@@ -1,4 +1,3 @@
-import { BufType } from "../types";
 import { masked_number } from '../utils';
 
 export class MidiBuffer {

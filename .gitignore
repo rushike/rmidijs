@@ -1,2 +1,9 @@
 .vite
+.vscode
+.DS_Store
+
 node_modules
+
+pnpm-lock.yaml
+
+*/soundfont/*

@@ -1,0 +1,6 @@
+{
+  "name": "rMidi Documentation",
+  "excludeExternals": true,
+  "includeVersion": true,
+  "entryPoints": ["src/index.ts"]
+}
