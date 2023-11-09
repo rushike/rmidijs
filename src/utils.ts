@@ -73,9 +73,21 @@ export const NOTES = {
   "flat" : ["C",  "Db", "D", "Eb", "E", "F",  "Gb", "G", "Ab", "A", "Bb", "B"] 
 }
 
-export function midi_note(id : number, type : "sharp" | "flat" = "sharp") {
+export const midi_note_name = () => {
+  
+}
+
+export function midi_note(id : number , type : "sharp" | "flat" = "sharp") {
+  // var name;
+  // if (typeof id === "string") {
+  //   name = id;
+  //   if(id.includes("#")) {
+  //     NOTES.sharp.indexOf(id.replace("#", ""))
+  //   }
+  // }
+
   var octave = Math.floor(id / 12) - 1
-  var name = `${NOTES[type][id % 12]}{octave}`
+  var name = `${NOTES[type][id % 12]}${octave}`
   return {
     id,
     name,

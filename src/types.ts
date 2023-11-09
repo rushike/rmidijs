@@ -31,6 +31,14 @@ export type MidiEventType = {
   microsecs? : number
 }
 
+export type MidiNoteType = {
+  delta_time : number
+  ticks      : number
+  time       : number
+  note_id    : number
+  velocity   : number
+}
+
 export type AbsMidiHeaderType = { 
   "format"     : number
   "resolution" : number
@@ -43,6 +51,7 @@ export type AbsMidiTrackType = {
   tempos     : AbsTempoEventType[]
   time_sigs? : AbsTimeSigEventType[]
   notes      : AbsMidiNoteType[]
+  events     : MidiEventType[]
   controller?: AbsControllerEventType[]
 }
 

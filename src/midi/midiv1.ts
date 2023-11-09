@@ -28,6 +28,8 @@ export class Midiv1 {
 		})
 	}
 
+	abs() {return new AbsMidiv1(this)}
+
 	/**
 	 *  
 	 * @param track index of the track
@@ -83,11 +85,10 @@ export class AbsMidiv1 {
 	constructor(src : Midiv1) {
 		this.header = src.header;
 
-
-
 		src.tracks.forEach((track, i) => {
 			var name = src.track_name(i);
 			var notes : AbsMidiNoteType[] = [];
+			var events : MidiEventType[] = [];
 			var controller = {}
 			var tempos : AbsTempoEventType[] = [];
 
@@ -111,22 +112,26 @@ export class AbsMidiv1 {
 				ticks += event.delta_time
 				time += event.delta_time * tempo.secs / this.header.resolution;
 				
+				if (event.subtype !== "note_off") {
+
+				}
+
 				switch(event.subtype) {
 					case "note_off": 
 						if (event.note_id && event.note_id in timekeeper) {
 							var note = timekeeper[event.note_id];
-							note.time && notes.push({
+							note.time && notes.push(Object.assign(note, {
 								time,
 								ticks,
 								duration : time - note.time,
 								velocity : note.velocity || 90,
 								...midi_note(event.note_id),
-							})
+							}))
 						}
 						break;
 					case "note_on" :
 						if (typeof event.note_id === "number") {
-							timekeeper[event.note_id] = {time : time, ...event}
+							timekeeper[event.note_id] = Object.assign(event, {time})
 						}
 						break;
 					case "set_tempo":
@@ -136,14 +141,15 @@ export class AbsMidiv1 {
 							secs : (event.microsecs || 500000 ) / 1e6
 						}
 						tempos.push(tempo)
+						break;
 				}
+				if(event.subtype !== "note_off") events.push(event)
 			})
-
-
 
 			this.tracks.push({
 				name : name || `Track-${i}`,
 				notes,
+				events,
 				tempos
 			})
 		})
