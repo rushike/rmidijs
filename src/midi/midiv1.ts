@@ -3,7 +3,8 @@ import { AbsMidiHeaderType, AbsMidiTrackType, AbsTempoEventType, MidiHeaderType,
 import { clone, midi_note } from '../utils';
 
 /*
-class to parse the .mid base64 string
+Class to parse the .mid base64 string.
+Midi hold the js object notation of midi binary file.
 */
 export class Midiv1 {
 	header : MidiHeaderType; // Midi header

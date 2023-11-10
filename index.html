@@ -25,7 +25,7 @@
       var midi = new Midi(src);
       console.log(midi);
 
-      new BasicMidiPlayer(midi).load().then(_=>_.start());
+      new BasicMidiPlayer(midi, [2, 3, 4, ,5, 6]).load().then(_=>_.start());
       // Tone.Offline(async ()=> {
       //   var piano = await new AcousticGrandPiano().load();
       //   console.log(piano);

@@ -1,12 +1,22 @@
 import { Reader } from "../reader";
-import { MidiHeaderType, MidiTrackType } from "../types";
+import { MidiEventType, MidiHeaderType, MidiTrackType } from "../types";
 import { is_equal } from "../utils";
 import { MidiBuffer } from "./buffer";
 
 export function midi_parser_v1(src : string | Uint8Array) {
+	/** store midi file header */
+	var header : MidiHeaderType; 
+	
 	var last_event_type_byte : any;
 
+	/** midi ticks */
 	var ticks = 0;
+
+	/** store the tempo in sec / per quater note */
+	var tempo = 0.5;
+
+	/** quantized time in seconds */
+	var time = 0; 
 
 	function read_chunk(buf : MidiBuffer) {
 		var id = buf.read(4);
@@ -20,11 +30,19 @@ export function midi_parser_v1(src : string | Uint8Array) {
 
 	
 	function read_event(buf : MidiBuffer) {
-		var event : any = {};
+
+		// @ts-ignore
+		var event : MidiEventType = {};
+		
 		event.delta_time = buf.read_varint();
 		ticks += event.delta_time;
 		event.ticks = ticks;
+		
+		time = Math.round( (ticks * 8) /  header.resolution ) * tempo / 8;
+		event.time = time
+
 		var event_type_byte = buf.read_int8();
+
 		if ((event_type_byte & 0xf0) == 0xf0) {
 			/* system / meta event */
 			if (event_type_byte == 0xff) {
@@ -85,7 +103,7 @@ export function midi_parser_v1(src : string | Uint8Array) {
 						event.subtype = 'smpte_offset';
 						if (length != 5) throw "Expected length for smpte_offset event is 5, got " + length;
 						var hourByte = buf.read_int8();
-						event.frameRate = {
+						event.frame_rate = {
 							0x00: 24, 0x20: 25, 0x40: 29, 0x60: 30
 						}[hourByte & 0x60];
 						event.hour = hourByte & 0x1f;
@@ -171,12 +189,12 @@ export function midi_parser_v1(src : string | Uint8Array) {
 					return event;
 				case 0x0b:
 					event.subtype = 'controller';
-					event.controllerType = param1;
+					event.controller_type = param1;
 					event.value = buf.read_int8();
 					return event;
 				case 0x0c:
-					event.subtype = 'programChange';
-					event.programNumber = param1;
+					event.subtype = 'program_change';
+					event.program_number = param1;
 					return event;
 				case 0x0d:
 					event.subtype = 'channel_after_touch';
@@ -221,7 +239,7 @@ export function midi_parser_v1(src : string | Uint8Array) {
     } else {
       resolution = time_division;
     }
-    var header : MidiHeaderType = {
+    header = {
       'format': format,
       'tracks': count,
       'resolution': resolution

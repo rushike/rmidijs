@@ -44,10 +44,12 @@ export class BasicMidiPlayer {
 
   ticker  : number = 0;
 
-  constructor(midi : Midi) {
+  constructor(midi : Midi, tracks : number[] = [0]) {
     this.midi = midi;
 
-    this.players = this.midi.tracks.slice(2, 6).map(_ => new BasicTrackPlayer(midi.header, _))
+    this.players = this.midi.tracks
+                    .filter((_, i)=>tracks.includes(i))
+                    .map(_ => new BasicTrackPlayer(midi.header, _))
   }
 
   async load() {
